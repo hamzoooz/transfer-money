@@ -1,0 +1,10 @@
+node_modules
+dist
+backend
+venv
+.git
+.env
+.env.example
+docker-compose.yml
+Dockerfile
+nginx
