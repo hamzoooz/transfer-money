@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     CurrencyViewSet, BankAccountViewSet, TransferRequestViewSet, 
-    SiteSettingsViewSet, RegisterView, CustomAuthToken
+    SiteSettingsViewSet, RegisterView, CustomAuthToken, ServiceViewSet
 )
 
 router = DefaultRouter()
@@ -10,6 +10,7 @@ router.register(r'currencies', CurrencyViewSet)
 router.register(r'bank-accounts', BankAccountViewSet)
 router.register(r'transfers', TransferRequestViewSet)
 router.register(r'settings', SiteSettingsViewSet, basename='settings')
+router.register(r'services', ServiceViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

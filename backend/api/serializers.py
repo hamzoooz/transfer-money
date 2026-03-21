@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Currency, BankAccount, TransferRequest, SiteSettings
+from .models import Currency, BankAccount, TransferRequest, SiteSettings, Service
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,6 +25,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSettings
+        fields = '__all__'
+
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
         fields = '__all__'
 
 class CurrencySerializer(serializers.ModelSerializer):

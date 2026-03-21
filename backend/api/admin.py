@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.db.models import Sum, Count
 from django.utils.html import format_html
-from .models import Currency, BankAccount, TransferRequest, SiteSettings
+from .models import Currency, BankAccount, TransferRequest, SiteSettings, Service
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('title', 'icon_name', 'is_active', 'priority')
+    list_editable = ('is_active', 'priority')
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
@@ -12,16 +17,18 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
-    list_display = ('flag', 'code', 'name', 'buy_rate', 'sell_rate', 'change_percent', 'is_active', 'show_in_rates_table')
-    list_editable = ('buy_rate', 'sell_rate', 'change_percent', 'is_active', 'show_in_rates_table')
+    list_display = ('flag', 'code', 'name', 'buy_rate', 'sell_rate', 'change_percent', 'is_active', 'show_in_rates_table', 'priority', 'region')
+    list_editable = ('buy_rate', 'sell_rate', 'is_active', 'show_in_rates_table', 'priority')
     search_fields = ('code', 'name')
-    list_filter = ('is_active', 'show_in_rates_table')
+    list_filter = ('is_active', 'show_in_rates_table', 'region', 'is_crypto')
+    list_per_page = 50
 
 @admin.register(BankAccount)
 class BankAccountAdmin(admin.ModelAdmin):
-    list_display = ('bank_name', 'country', 'account_name', 'currency', 'is_active')
-    list_filter = ('country', 'currency', 'is_active')
+    list_display = ('provider_name', 'method_type', 'country', 'account_name', 'currency', 'is_active')
+    list_filter = ('country', 'currency', 'is_active', 'method_type')
     list_editable = ('is_active',)
+    search_fields = ('provider_name', 'account_name', 'account_number', 'country')
 
 @admin.register(TransferRequest)
 class TransferRequestAdmin(admin.ModelAdmin):
@@ -35,7 +42,7 @@ class TransferRequestAdmin(admin.ModelAdmin):
             'fields': ('status', 'receipt')
         }),
         ('Transfer Details', {
-            'fields': ('selected_account', 'amount_sent', 'currency_sent', 'exchange_rate_at_time', 'amount_to_receive_sdg')
+            'fields': ('user', 'selected_account', 'amount_sent', 'currency_sent', 'exchange_rate_at_time', 'amount_to_receive_sdg')
         }),
         ('Recipient (Bankak)', {
             'fields': ('bankak_name', 'bankak_number', 'sender_name')

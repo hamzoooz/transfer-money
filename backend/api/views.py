@@ -1,13 +1,14 @@
 from rest_framework import viewsets, mixins, status, generics
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.models import User
-from .models import Currency, BankAccount, TransferRequest, SiteSettings
+from .models import Currency, BankAccount, TransferRequest, SiteSettings, Service
 from .serializers import (
     CurrencySerializer, BankAccountSerializer, TransferRequestSerializer, 
-    SiteSettingsSerializer, UserSerializer, RegisterSerializer
+    SiteSettingsSerializer, UserSerializer, RegisterSerializer, ServiceSerializer
 )
 
 class RegisterView(generics.CreateAPIView):
@@ -48,13 +49,29 @@ class SiteSettingsViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(settings)
         return Response(serializer.data)
 
+class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Service.objects.filter(is_active=True).order_by('priority', 'title')
+    serializer_class = ServiceSerializer
+
 class CurrencyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Currency.objects.filter(is_active=True)
     serializer_class = CurrencySerializer
 
+    @action(detail=False, methods=['get'])
+    def catalog(self, request):
+        queryset = Currency.objects.all().order_by('priority', 'code')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 class BankAccountViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = BankAccount.objects.filter(is_active=True)
     serializer_class = BankAccountSerializer
+
+    @action(detail=False, methods=['get'])
+    def catalog(self, request):
+        queryset = BankAccount.objects.select_related('currency').all().order_by('country', 'provider_name')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 class TransferRequestViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = TransferRequest.objects.all()
